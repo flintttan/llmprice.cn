@@ -2178,11 +2178,22 @@
             return collapsedProviderCards.has(providerId);
         }
 
+        function getPriceBarFillStyle(widthPercent) {
+            if (!Number.isFinite(widthPercent) || widthPercent <= 0) {
+                return 'width: 0%; min-width: 0;';
+            }
+
+            const clampedWidth = Math.min(100, Math.max(0, widthPercent));
+            return `width: ${clampedWidth}%; min-width: 2px;`;
+        }
+
         function renderCard(provider) {
             const isCollapsed = isProviderCardCollapsed(provider.id);
             const modelRows = provider.models.map(model => {
                 const inputBarWidth = model.isFree || maxInputPrice === 0 ? 0 : (model.inputPrice / maxInputPrice * 100);
                 const outputBarWidth = model.isFree || maxOutputPrice === 0 ? 0 : (model.outputPrice / maxOutputPrice * 100);
+                const inputBarStyle = getPriceBarFillStyle(inputBarWidth);
+                const outputBarStyle = getPriceBarFillStyle(outputBarWidth);
                 const suffix = model.isTiered ? ' 起' : '';
 
                 let inputPriceHtml;
@@ -2195,12 +2206,12 @@
                     inputPriceHtml = `
                         <span class="price-input">${formatNumber(model.inputPrice)}元${suffix}</span>
                         <span class="price-usd">($${formatNumber(model.inputUsd)})</span>
-                        <div class="price-bar"><div class="price-bar-fill input" style="width: ${inputBarWidth}%"></div></div>
+                        <div class="price-bar"><div class="price-bar-fill input" style="${inputBarStyle}"></div></div>
                     `;
                     outputPriceHtml = `
                         <span class="price-output">${formatNumber(model.outputPrice)}元${suffix}</span>
                         <span class="price-usd">($${formatNumber(model.outputUsd)})</span>
-                        <div class="price-bar"><div class="price-bar-fill output" style="width: ${outputBarWidth}%"></div></div>
+                        <div class="price-bar"><div class="price-bar-fill output" style="${outputBarStyle}"></div></div>
                     `;
                 }
 
